@@ -6,21 +6,32 @@
   <title>SYSTEM BREACH</title>
   <style>
     body { margin:0; padding:0; background:#000; color:#0f0; font-family:'Courier New',monospace; overflow:hidden; height:100vh; user-select:none; touch-action:none; }
-    #overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; animation:flicker 0.1s infinite alternate; pointer-events:none; }
-    h1 { font-size:4rem; color:#f00; text-shadow:0 0 20px #f00; margin:0; animation:glitch 1s infinite; }
-    p { font-size:1.5rem; max-width:90%; line-height:1.8; }
-    .countdown { font-size:3rem; color:#f00; margin:30px 0; }
+    #start { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2.5rem; color:#0f0; z-index:10; text-align:center; }
+    #overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; animation:flicker 0.1s infinite alternate; pointer-events:auto; z-index:10; }
+    h1 { font-size:4.5rem; color:#f00; text-shadow:0 0 20px #f00; margin:0; animation:glitch 1s infinite; }
+    p { font-size:1.6rem; max-width:90%; line-height:1.8; }
+    .countdown { font-size:3.5rem; color:#f00; margin:30px 0; }
     @keyframes flicker { 0%{opacity:0.9;} 100%{opacity:1;} }
     @keyframes glitch { 0%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} 50%{text-shadow:-3px -3px #0ff,3px 3px #f0f;} 100%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} }
-    .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; }
+    .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
     @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
-    #start { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2rem; color:#0f0; z-index:10; }
+
+    /* Big invisible blocker for bottom swipe area */
+    #swipeBlocker { 
+      position:fixed; 
+      bottom:0; left:0; right:0; 
+      height:300px; /* Covers a huge bottom area to block swipe-up gestures */
+      background:transparent; 
+      z-index:9999; 
+      pointer-events:auto; 
+      display:none; 
+    }
   </style>
 </head>
 <body>
   <div class="matrix"></div>
-  <div id="start">TAP SCREEN TO START SECURITY SCAN</div>
-  <div id="overlay" style="display:none;">
+  <div id="start">TAP SCREEN<br>TO START<br>SECURITY SCAN</div>
+  <div id="overlay">
     <h1>HACKED</h1>
     <p>Your device has been fully compromised.</p>
     <p>IP Address: 192.168.69.420<br>Camera: ACTIVE<br>All data encrypted with ransomware.</p>
@@ -29,61 +40,55 @@
     <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
   </div>
 
+  <!-- Blocker for swipe-up / bottom navigation -->
+  <div id="swipeBlocker"></div>
+
   <script>
-    let lockdownTime = 20;
-    const startScreen = document.getElementById('start');
+    let time = 20;
+    const start = document.getElementById('start');
     const overlay = document.getElementById('overlay');
     const countdown = document.getElementById('countdown');
+    const swipeBlocker = document.getElementById('swipeBlocker');
 
-    // Start on any tap/click
-    document.body.addEventListener('touchstart', startPrank, {once: true});
-    document.body.addEventListener('click', startPrank, {once: true});
+    document.body.addEventListener('touchstart', startLockdown, {once: true});
+    document.body.addEventListener('click', startLockdown, {once: true});
 
-    async function startPrank(e) {
+    async function startLockdown(e) {
       e.preventDefault();
-      startScreen.style.display = 'none';
+      start.style.display = 'none';
       overlay.style.display = 'flex';
+      swipeBlocker.style.display = 'block'; // Block bottom swipes
 
-      // Go fullscreen with hidden navigation UI (hides bottom buttons on Android)
+      // Fullscreen hide bars
       if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        await document.documentElement.webkitRequestFullscreen();
+        await document.documentElement.requestFullscreen({ navigationUI: "hide" });
       }
 
-      // Block all touch/clicks
-      overlay.style.pointerEvents = 'auto';
-      document.body.style.touchAction = 'none';
+      // Block all swipe/touchmove gestures
+      document.addEventListener('touchmove', blockSwipe, { passive: false });
 
-      // Countdown & unlock after 20s
       const timer = setInterval(() => {
-        lockdownTime--;
-        countdown.textContent = `SYSTEM LOCKDOWN: ${lockdownTime}`;
-        if (lockdownTime <= 0) {
+        time--;
+        countdown.textContent = `SYSTEM LOCKDOWN: ${time}`;
+        if (time <= 0) {
           clearInterval(timer);
           countdown.textContent = "SYSTEM LOCKED";
-          unlockPrank();
+          endLockdown();
         }
       }, 1000);
-
-      // Block keyboard/back attempts
-      window.addEventListener('keydown', blockKeys);
-      history.pushState(null, null, location.href);
-      window.onpopstate = () => history.go(1);
     }
 
-    function blockKeys(e) {
-      if (['Escape','Backspace'].includes(e.key) || (e.ctrlKey && e.key === 'w')) e.preventDefault();
+    function blockSwipe(e) {
+      e.preventDefault(); // Stops swipe-up from revealing buttons
     }
 
-    function unlockPrank() {
+    function endLockdown() {
+      swipeBlocker.style.display = 'none';
+      document.removeEventListener('touchmove', blockSwipe);
       if (document.exitFullscreen) document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      overlay.style.pointerEvents = 'none';
-      document.body.style.touchAction = 'manipulation';
     }
 
-    // Extra: Block context menu
+    // Extra blocks
     document.addEventListener('contextmenu', e => e.preventDefault());
   </script>
 </body>

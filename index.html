@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SYSTEM BREACH</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+      height: 100vh;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none; /* Completely disables touch on mobile */
+    }
+    #blocker {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: transparent;
+      z-index: 9999;
+      pointer-events: auto;
+      display: block;
+    }
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      animation: flicker 0.1s infinite alternate;
+      pointer-events: none;
+    }
+    h1 {
+      font-size: 4rem;
+      color: #f00;
+      text-shadow: 0 0 20px #f00;
+      margin: 0;
+    }
+    p {
+      font-size: 1.5rem;
+      max-width: 90%;
+      line-height: 1.8;
+    }
+    .glitch {
+      animation: glitch 1s infinite;
+    }
+    .countdown {
+      font-size: 3rem;
+      color: #f00;
+      margin: 30px 0;
+    }
+    @keyframes flicker {
+      0% { opacity: 0.9; }
+      100% { opacity: 1; }
+    }
+    @keyframes glitch {
+      0% { text-shadow: 3px 3px #0ff, -3px -3px #f0f; }
+      50% { text-shadow: -3px -3px #0ff, 3px 3px #f0f; }
+      100% { text-shadow: 3px 3px #0ff, -3px -3px #f0f; }
+    }
+    .matrix {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0.15;
+      background: repeating-linear-gradient(0deg, #0f0, #0f0 1px, transparent 1px, transparent 2px);
+      animation: rain 8s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rain {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="matrix"></div>
+  <div id="overlay">
+    <h1 class="glitch">HACKED</h1>
+    <p>Your device has been fully compromised.</p>
+    <p>IP Address: 192.168.69.420<br>
+    Camera: ACTIVE<br>
+    All data encrypted with ransomware.</p>
+    <p>Payment required: $1000 in Bitcoin<br>
+    Wallet: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+    <div class="countdown" id="countdown">SYSTEM LOCKDOWN: 20</div>
+    <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
+  </div>
+
+  <!-- Invisible blocker layer for full lockdown -->
+  <div id="blocker"></div>
+
+  <script>
+    let lockdownTime = 20;
+    const countdown = document.getElementById('countdown');
+    const blocker = document.getElementById('blocker');
+
+    const timer = setInterval(() => {
+      lockdownTime--;
+      countdown.textContent = `SYSTEM LOCKDOWN: ${lockdownTime}`;
+      if (lockdownTime <= 0) {
+        clearInterval(timer);
+        countdown.textContent = "SYSTEM LOCKED";
+        blocker.style.display = 'none'; // Unlock touch & clicks
+      }
+    }, 1000);
+
+    // Block keyboard escapes during lockdown
+    window.addEventListener('keydown', (e) => {
+      if (lockdownTime > 0) {
+        if (e.key === 'Escape' || e.key === 'F12' || 
+            (e.ctrlKey && e.key === 'w') || 
+            (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+            (e.altKey && e.key === 'F4') || 
+            e.key === 'Backspace') {
+          e.preventDefault();
+        }
+      }
+    });
+
+    // Block back button
+    history.pushState(null, null, location.href);
+    window.onpopstate = () => {
+      if (lockdownTime > 0) {
+        history.go(1);
+      }
+    };
+
+    // Block right-click
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Prevent any touch/move during lockdown (extra safety)
+    document.addEventListener('touchmove', e => {
+      if (lockdownTime > 0) e.preventDefault();
+    }, { passive: false });
+  </script>
+</body>
+    </html>

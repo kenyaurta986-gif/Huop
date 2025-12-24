@@ -1,94 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>SYSTEM BREACH</title>
-  <style>
-    body { margin:0; padding:0; background:#000; color:#0f0; font-family:'Courier New',monospace; overflow:hidden; height:100vh; user-select:none; touch-action:none; }
-    #start { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2.5rem; color:#0f0; z-index:10; text-align:center; }
-    #overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; animation:flicker 0.1s infinite alternate; pointer-events:auto; z-index:10; }
-    h1 { font-size:4.5rem; color:#f00; text-shadow:0 0 20px #f00; margin:0; animation:glitch 1s infinite; }
-    p { font-size:1.6rem; max-width:90%; line-height:1.8; }
-    .countdown { font-size:3.5rem; color:#f00; margin:30px 0; }
-    @keyframes flicker { 0%{opacity:0.9;} 100%{opacity:1;} }
-    @keyframes glitch { 0%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} 50%{text-shadow:-3px -3px #0ff,3px 3px #f0f;} 100%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} }
-    .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
-    @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
-
-    .fake-popup { position:fixed; left:0; right:0; background:rgba(200,0,0,0.95); color:#fff; font-size:2.5rem; text-align:center; padding:30px; z-index:9999; pointer-events:auto; display:none; animation:flash 1s; }
-    @keyframes flash { 0%{opacity:0; transform:scale(0.8);} 50%{opacity:1; transform:scale(1.1);} 100%{opacity:0; transform:scale(1);} }
-    .bottom-popup { bottom:0; height:250px; }
-    .top-popup { top:0; height:250px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SYSTEM BREACH</title>
+<style>
+body { margin:0; padding:0; background:#000; color:#0f0; font-family:'Courier New',monospace; overflow:hidden; height:100vh; user-select:none; touch-action:none; }
+#start { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2.5rem; color:#0f0; z-index:10; text-align:center; }
+#overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; animation:flicker 0.1s infinite alternate; pointer-events:auto; z-index:10; }
+h1 { font-size:4.5rem; color:#f00; text-shadow:0 0 20px #f00; margin:0; animation:glitch 1s infinite; }
+p { font-size:1.6rem; max-width:90%; line-height:1.8; }
+.countdown { font-size:3.5rem; color:#f00; margin:30px 0; }
+@keyframes flicker { 0%{opacity:0.9;} 100%{opacity:1;} }
+@keyframes glitch { 0%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} 50%{text-shadow:-3px -3px #0ff,3px 3px #f0f;} 100%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} }
+.matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
+@keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
+.fake-popup { position:fixed; left:0; right:0; background:rgba(200,0,0,0.95); color:#fff; font-size:2.5rem; text-align:center; padding:40px; z-index:9999; pointer-events:auto; display:none; animation:flash 1.2s; }
+@keyframes flash { 0%{opacity:0; transform:scale(0.8);} 50%{opacity:1; transform:scale(1.1);} 100%{opacity:0; transform:scale(1);} }
+.bottom-popup { bottom:0; height:300px; }
+.top-popup { top:0; height:300px; }
+</style>
 </head>
 <body>
-  <div class="matrix"></div>
-  <div id="start">TAP SCREEN<br>TO START<br>SECURITY SCAN</div>
-  <div id="overlay">
-    <h1>HACKED</h1>
-    <p>Your device has been fully compromised.</p>
-    <p>IP Address: 192.168.69.420<br>Camera: ACTIVE<br>All data encrypted with ransomware.</p>
-    <p>Payment required: $1000 in Bitcoin<br>Wallet: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
-    <div class="countdown" id="countdown">SYSTEM LOCKDOWN: 20</div>
-    <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
-  </div>
+<div class="matrix"></div>
+<div id="start">TAP SCREEN<br>TO START<br>SECURITY SCAN</div>
+<div id="overlay">
+<h1>HACKED</h1>
+<p>Your device has been fully compromised.</p>
+<p>IP Address: 192.168.69.420<br>Camera: ACTIVE<br>All data encrypted with ransomware.</p>
+<p>Payment required: $1000 in Bitcoin<br>Wallet: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+<div class="countdown" id="countdown">SYSTEM LOCKDOWN: 20</div>
+<p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
+</div>
 
-  <script>
-    const scaryMessages = ["ACCESS DENIED", "NO ESCAPE", "HACKER ACTIVE", "SYSTEM LOCKED", "CAMERA WATCHING", "PAY NOW", "FILES GONE", "INTRUDER ALERT", "BACKDOOR OPEN", "TRAPPED FOREVER"];
-    for(let i = 0; i < 10; i++) {
-      let msg = scaryMessages[i % scaryMessages.length];
-      document.write(`<div class="fake-popup bottom-popup" onclick="this.style.display='none'">${msg}</div>`);
-      document.write(`<div class="fake-popup top-popup" onclick="this.style.display='none'">${msg}</div>`);
+<script>
+const scaryMessages = ["ACCESS DENIED", "NO ESCAPE", "HACKER ACTIVE", "SYSTEM LOCKED", "CAMERA WATCHING", "PAY NOW", "FILES GONE", "INTRUDER ALERT", "BACKDOOR OPEN", "TRAPPED FOREVER"];
+for(let i = 0; i < 10; i++) {
+  let msg = scaryMessages[i % scaryMessages.length];
+  document.write(`<div class="fake-popup bottom-popup" onclick="this.style.display='none'">${msg}</div>`);
+  document.write(`<div class="fake-popup top-popup" onclick="this.style.display='none'">${msg}</div>`);
+}
+</script>
+
+<script>
+let time = 20;
+const start = document.getElementById('start');
+const overlay = document.getElementById('overlay');
+const countdown = document.getElementById('countdown');
+const popups = document.querySelectorAll('.fake-popup');
+
+document.body.addEventListener('touchstart', startLockdown, {once: true});
+document.body.addEventListener('click', startLockdown, {once: true});
+
+async function startLockdown(e) {
+  e.preventDefault();
+  start.style.display = 'none';
+  overlay.style.display = 'flex';
+
+  popups.forEach(p => p.style.display = 'block');
+
+  if (document.documentElement.requestFullscreen) {
+    await document.documentElement.requestFullscreen({ navigationUI: "hide" });
+  }
+
+  // Max touch/swipe block
+  document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+  document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
+
+  // Max back button block
+  history.pushState(null, null, location.href);
+  history.pushState(null, null, location.href);
+  history.pushState(null, null, location.href);
+  window.onpopstate = () => history.pushState(null, null, location.href);
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'Escape') e.preventDefault();
+  });
+
+  const timer = setInterval(() => {
+    time--;
+    countdown.textContent = `SYSTEM LOCKDOWN: ${time}`;
+    if (time <= 0) {
+      clearInterval(timer);
+      countdown.textContent = "SYSTEM LOCKED";
+      endLockdown();
     }
-  </script>
+  }, 1000);
+}
 
-  <script>
-    let time = 20;
-    const start = document.getElementById('start');
-    const overlay = document.getElementById('overlay');
-    const countdown = document.getElementById('countdown');
-    const popups = document.querySelectorAll('.fake-popup');
+function endLockdown() {
+  popups.forEach(p => p.style.display = 'none');
+  if (document.exitFullscreen) document.exitFullscreen();
+}
 
-    document.body.addEventListener('touchstart', startLockdown, {once: true});
-    document.body.addEventListener('click', startLockdown, {once: true});
-
-    async function startLockdown(e) {
-      e.preventDefault();
-      start.style.display = 'none';
-      overlay.style.display = 'flex';
-
-      popups.forEach(p => p.style.display = 'block');
-
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen({ navigationUI: "hide" });
-      }
-
-      // Strongest swipe/touch block
-      document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
-      document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-
-      // Back button block
-      history.pushState(null, null, location.href);
-      window.onpopstate = () => history.pushState(null, null, location.href);
-
-      const timer = setInterval(() => {
-        time--;
-        countdown.textContent = `SYSTEM LOCKDOWN: ${time}`;
-        if (time <= 0) {
-          clearInterval(timer);
-          countdown.textContent = "SYSTEM LOCKED";
-          endLockdown();
-        }
-      }, 1000);
-    }
-
-    function endLockdown() {
-      popups.forEach(p => p.style.display = 'none');
-      if (document.exitFullscreen) document.exitFullscreen();
-    }
-
-    document.addEventListener('contextmenu', e => e.preventDefault());
-  </script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
 </body>
 </html>

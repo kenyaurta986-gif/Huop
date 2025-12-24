@@ -63,16 +63,17 @@ async function startLockdown(e) {
     await document.documentElement.requestFullscreen({ navigationUI: "hide" });
   }
 
-  // Max touch/swipe block
   document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
 
-  // Max back button block
-  history.pushState(null, null, location.href);
-  history.pushState(null, null, location.href);
-  history.pushState(null, null, location.href);
-  window.onpopstate = () => history.pushState(null, null, location.href);
+  // ULTRA STRONG back arrow block - clicking many times does NOTHING
+  for(let i = 0; i < 20; i++) {
+    history.pushState(null, null, location.href);
+  }
+  window.onpopstate = () => {
+    history.pushState(null, null, location.href);
+  };
   window.addEventListener('keydown', e => {
     if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'Escape') e.preventDefault();
   });

